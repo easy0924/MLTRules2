@@ -11,11 +11,15 @@
 #include <vector>
 #include <algorithm>
 
+using namespace std;
+
 #define MAX_LEN 100000000
 #define FULL_PROB 1.000000
-#define MIN_MONO_PROB 0.500000
+#define MINIMUM_PROB 0.500000
 
-using namespace std;
+typedef map<string, map<vector<int>, double> > RULES;
+typedef pair<string, pair<vector<int>, double> > RULE;
+typedef map<vector<int>, double> RIGHT_RULES;
 
 class GraphNode;
 
@@ -27,7 +31,7 @@ public:
     string comment;
     GraphNode *target;
 
-    Edge();
+    Edge(string word, int pos, double prob, string comment, GraphNode *target);
     ~Edge();
 };
 
@@ -35,14 +39,17 @@ class GraphNode {
 public:
     int id;
     vector<Edge> next;
+
     GraphNode();
     GraphNode(Edge);
     ~GraphNode();
 
+    static string getComment(const RULE &rule);
     static vector<GraphNode*> parseSentence(string txt);
-    static void addBranch(vector<GraphNode*> &mpath, int, int, const vector<int> &branch, double prob, pair<string, pair<vector<int>, double> > &rule);
-    static void outputLattice(ofstream ofs, GraphNode* start);
-    static string getComment(pair<string, pair<vector<int>, double> > &rule);
+    static void addBranch(vector<GraphNode*> &mpath, int startp, int endp, const vector<int> &branch, double prob, const RULE &rule);
+    static void outputLattice(ostream &out, GraphNode* start);
+
 };
 
 #endif
+

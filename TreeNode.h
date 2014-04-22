@@ -37,8 +37,7 @@ public:
     static TreeNode* parseSentence(string, const map<int, int>&, const map<int, int>&);
 
     void extractRules(map<pair<string, string>, int>&, map<string, int>&, int);
-    void applyRules(map<string, pair<vector<int>, double> >&, vector<GraphNode*>&, int);
+    void applyRules(const RULES &rules, vector<GraphNode*>& mpath, int layers);
     void print() const;
 };
-
 #endif

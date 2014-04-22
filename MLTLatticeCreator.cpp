@@ -23,7 +23,9 @@ MLTLatticeCreator::MLTLatticeCreator(char* ruleFile, int layers0) {
         prob >> y;
 
         cerr << "adding rule to lattice creator: " << endl;
-        rules.insert(make_pair(lh, make_pair(rh, y)));
+        if (rules.find(lh) == rules.end())
+            rules[lh] = RIGHT_RULES();
+        rules[lh].insert(make_pair(rh, y));
         cerr << "|" + lh + "|" << endl;
         cerr << "|" + line.substr(pos + 4, pos2 - pos - 4) + "|" << endl;
         cerr << "|" + line.substr(pos2 + 4) + "|" << endl;
@@ -64,11 +66,11 @@ void MLTLatticeCreator::createLatticeForSentence(string txt, string tags, string
     ofstream latFile;
     latFile.open(destFile, ofstream::out);
     TreeNode* tre = TreeNode::parseSentence(tree, dummy, dummy);
-   // vector<GraphNode*> mpath = GraphNode::parseSentence(txt);
+    vector<GraphNode*> mpath = GraphNode::parseSentence(txt);
 
-   // tre -> applyRules(rules, mpath, layers);
+    tre -> applyRules(rules, mpath, layers);
 
-   // GraphNode::outputLattice(latFile, mpath[0]);
+    GraphNode::outputLattice(latFile, mpath[0]);
     latFile.close();
 }
 

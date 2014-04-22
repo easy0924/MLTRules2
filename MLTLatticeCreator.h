@@ -19,7 +19,7 @@
 
 class MLTLatticeCreator {
 private:
-    map<string, pair<vector<int>, double> > rules;
+    RULES rules;
     map<int, int> dummy;
     int layers;
 //	double cutoffSyntaxRules;

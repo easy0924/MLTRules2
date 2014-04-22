@@ -6,6 +6,7 @@ map<int, int> TreeNode::left_, TreeNode::right_;
 
 int TreeNode::tcnt = 0;
 
+
 TreeNode::TreeNode() {
     tcnt ++;
     label = "";
@@ -212,7 +213,7 @@ void TreeNode::print() const {
     }
 }
 
-void TreeNode::void applyRules(map<string, pair<vector<int>, double> > &rules, vector<GraphNode*> &mpath, int layers) {
+void TreeNode::applyRules(const RULES &rules, vector<GraphNode*> &mpath, int layer) {
 
     for (vector<TreeNode*>::iterator i = child.begin(); i != child.end(); ++i)
         if ((*i) -> word == "")
@@ -227,17 +228,19 @@ void TreeNode::void applyRules(map<string, pair<vector<int>, double> > &rules, v
     rh.clear();
     int xcnt = 0;
     getRules(lh, rh, xcnt, layer);
-    sort(rh.begin(), rh.end(), TreeNode::cmp);
 
     if (rules.find(lh) != rules.end()) {
-        vector<int> ord = rules[lh].first;
-        double prob = rules[lh].second;
-        vector<int> branch;
-        branch.clear();
-        for (vector<int>::iterator i = ord.begin(); i != ord.end(); ++i) {
-            for (int j = (*i)->left; j != (*i)->right; ++j)
-                branch.push_back(j);
+        const RIGHT_RULES &rr = rules.at(lh);
+        for (RIGHT_RULES::const_iterator i = rr.begin(); i != rr.end(); ++i) {
+            const vector<int> &ord = (*i).first;
+            double prob = (*i).second;
+            vector<int> branch;
+            branch.clear();
+            for (vector<int>::const_iterator j = ord.begin(); j != ord.end(); ++j)
+                for (int k = rh[*j].first->left; k != rh[*j].first->right; ++k)
+                    branch.push_back(k);
+            GraphNode::addBranch(mpath, left, right, branch, prob, make_pair(lh, (*i)));
+                       //addBranch(vector<GraphNode*> &mpath, int startp, int endp, const vector<int> &branch, double prob, const RULE &rule);
         }
-        GraphNode::addBranch(mpath, left, right, branch, prob, make_pair(lh, rules[lh]));
     }
 }

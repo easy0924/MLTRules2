@@ -36,23 +36,23 @@ vector<GraphNode*> GraphNode::parseSentence(string txt) {
     while (cin >> word) {
         idx ++;
         res.push_back(new GraphNode());
-        res[idx - 1].next.push_back(Edge(word, idx - 1, FULL_PROB, "Monoton", res[idx]));
+        res[idx - 1]->next.push_back(Edge(word, idx - 1, FULL_PROB, "Monoton", res[idx]));
     }
 
     return res;
 }
 
-void GraphNode::outputLattice(ofstream ofs, GraphNode* start) {
+void GraphNode::outputLattice(ostream &out, GraphNode* start) {
     int cnt = 0;
 
     queue<GraphNode*> q;
     vector<GraphNode*> lst;
-    q.clear();
     lst.clear();
     q.push(start);
     lst.push_back(start);
     while (!q.empty()) {
-        GraphNode *h = q.pop();
+        GraphNode *h = q.back();
+        q.pop();
         if (h -> id == -1) {
             h -> id = cnt ++;
         }
@@ -64,25 +64,26 @@ void GraphNode::outputLattice(ofstream ofs, GraphNode* start) {
     }
     for (vector<GraphNode*>::iterator i = lst.begin(); i != lst.end(); ++i) {
         for (vector<Edge>::iterator j = (*i) -> next.begin(); j!= (*i) -> next.end(); ++j) {
-            ofs << (*i) -> id << " " << ((*j).target) -> id << " " << (*j).word << " " << (*j).pos << " " << (*j).prob << " # " << (*j).comment << endl;
+            out << ((*i) -> id) << " " << (((*j).target) -> id) << " " << (*j).word << " " << (*j).pos << " " << (*j).prob << " # " << (*j).comment << endl;
         }
     }
 }
 
-void GraphNode::addBranch(vector<GraphNode*> &mpath, int st, int en, const vector<int> &branch, double prob, pair<string, pair<vector<int>, double> > &rule) {
-    GraphNode* prev = mpath[right + 1];
-    for (vector<int>::reverse_iterator i = branch.rbegin(); i != branch.rend(); ++i) {
-        GraphNode* x = new GraphNode(Edge(mpath[(*x)]->next[0].word, (*x), FULL_PROB, getComment(rule), prev));
+void GraphNode::addBranch(vector<GraphNode*> &mpath, int startp, int endp, const vector<int> &branch, double prob,const RULE &rule) {
+    GraphNode* prev = mpath[endp + 1];
+    for (vector<int>::const_reverse_iterator i = branch.rbegin(); i + 1 != branch.rend(); ++i) {
+        GraphNode* x = new GraphNode(Edge(mpath[(*i)]->next[0].word, (*i), FULL_PROB, getComment(rule), prev));
         prev = x;
     }
-    branch[left]->next.push_back(prev);
+    mpath[startp]->next.push_back(Edge(mpath[branch[0]]->next[0].word, branch[0], prob, getComment(rule), prev));
+    mpath[startp]->next[0].prob = max(MINIMUM_PROB, mpath[startp]->next[0].prob - prob);
 }
 
-string GraphNode::getComment(pair<string, pair<vector<int>, double> > &rule) {
+string GraphNode::getComment(const RULE &rule) {
     ostringstream res;
     res << "{'MLTRule': '" + rule.first + "#";
     res << rule.second.first[0];
-    for (vector<int>::iterator i = rule.second.first.begin(); i != rule.second.first.end(); ++i)
+    for (vector<int>::const_iterator i = rule.second.first.begin() + 1; i != rule.second.first.end(); ++i)
         res << "_" + (*i);
     res << "', 'WEIGHT': " << rule.second.second;
     return res.str();
