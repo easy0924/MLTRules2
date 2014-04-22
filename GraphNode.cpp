@@ -33,7 +33,7 @@ vector<GraphNode*> GraphNode::parseSentence(string txt) {
     istringstream in(txt);
     string word;
     int idx = 0;
-    while (cin >> word) {
+    while (in >> word) {
         idx ++;
         res.push_back(new GraphNode());
         res[idx - 1]->next.push_back(Edge(word, idx - 1, FULL_PROB, "Monoton", res[idx]));
@@ -70,8 +70,17 @@ void GraphNode::outputLattice(ostream &out, GraphNode* start) {
 }
 
 void GraphNode::addBranch(vector<GraphNode*> &mpath, int startp, int endp, const vector<int> &branch, double prob,const RULE &rule) {
+    for (int i = 0; i + 1< mpath.size(); ++i)
+        cerr << mpath[i]->next[0].word << " ";
+    cerr << endl;
+    cerr << branch.size() << endl;
+    for (int i = 0; i < branch.size(); ++i)
+        cerr << branch[i] << " " << endl;
+    cerr << endl;
+
     GraphNode* prev = mpath[endp + 1];
     for (vector<int>::const_reverse_iterator i = branch.rbegin(); i + 1 != branch.rend(); ++i) {
+        cerr << "test00" << endl;
         GraphNode* x = new GraphNode(Edge(mpath[(*i)]->next[0].word, (*i), FULL_PROB, getComment(rule), prev));
         prev = x;
     }

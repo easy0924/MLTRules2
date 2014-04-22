@@ -229,6 +229,7 @@ void TreeNode::applyRules(const RULES &rules, vector<GraphNode*> &mpath, int lay
     int xcnt = 0;
     getRules(lh, rh, xcnt, layer);
 
+    cerr << lh << endl;
     if (rules.find(lh) != rules.end()) {
         const RIGHT_RULES &rr = rules.at(lh);
         for (RIGHT_RULES::const_iterator i = rr.begin(); i != rr.end(); ++i) {
@@ -236,9 +237,14 @@ void TreeNode::applyRules(const RULES &rules, vector<GraphNode*> &mpath, int lay
             double prob = (*i).second;
             vector<int> branch;
             branch.clear();
-            for (vector<int>::const_iterator j = ord.begin(); j != ord.end(); ++j)
-                for (int k = rh[*j].first->left; k != rh[*j].first->right; ++k)
+            for (vector<int>::const_iterator j = ord.begin(); j != ord.end(); ++j) {
+                cerr << (*j) << " " ;
+                cerr << rh[*j].first->left << " ";
+                cerr << rh[*j].first->right << endl;
+                for (int k = rh[*j].first->left; k != rh[*j].first->right + 1; ++k)
                     branch.push_back(k);
+            }
+            cerr << "|" << branch.size() << endl;
             GraphNode::addBranch(mpath, left, right, branch, prob, make_pair(lh, (*i)));
                        //addBranch(vector<GraphNode*> &mpath, int startp, int endp, const vector<int> &branch, double prob, const RULE &rule);
         }

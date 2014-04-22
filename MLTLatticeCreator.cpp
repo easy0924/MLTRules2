@@ -9,6 +9,7 @@ MLTLatticeCreator::MLTLatticeCreator(char* ruleFile, int layers0) {
 
     string line, lh;
     ifstream in(ruleFile);
+    int nrules = 0;
     while (getline(in, line)) {
         int pos = line.find("----");
         lh = line.substr(0, pos - 1);
@@ -26,10 +27,10 @@ MLTLatticeCreator::MLTLatticeCreator(char* ruleFile, int layers0) {
         if (rules.find(lh) == rules.end())
             rules[lh] = RIGHT_RULES();
         rules[lh].insert(make_pair(rh, y));
-        cerr << "|" + lh + "|" << endl;
-        cerr << "|" + line.substr(pos + 4, pos2 - pos - 4) + "|" << endl;
-        cerr << "|" + line.substr(pos2 + 4) + "|" << endl;
+        cerr << "|" + lh + "|" << line.substr(pos + 4, pos2 - pos - 4) + "|" << line.substr(pos2 + 4) + "|" << endl;
+        nrules++;
     }
+    cerr << nrules << " Rules readed" << endl;
 }
 
 MLTLatticeCreator::~MLTLatticeCreator() {
@@ -54,6 +55,7 @@ void MLTLatticeCreator::createLatticesForText(char* textFileName, char* tagFileN
         string latname(buffer);
         Lattices << destDir << "/" << latticeCounter << ".lat" << endl;
         createLatticeForSentence(text, tags, tree, (destDir + "/" + latname + ".lat").c_str());
+        cerr << destDir << "/" << latticeCounter << ".lat finished" << endl;
         latticeCounter++;
 	}
 
@@ -67,9 +69,8 @@ void MLTLatticeCreator::createLatticeForSentence(string txt, string tags, string
     latFile.open(destFile, ofstream::out);
     TreeNode* tre = TreeNode::parseSentence(tree, dummy, dummy);
     vector<GraphNode*> mpath = GraphNode::parseSentence(txt);
-
     tre -> applyRules(rules, mpath, layers);
-
+    cerr << "test3" << endl;
     GraphNode::outputLattice(latFile, mpath[0]);
     latFile.close();
 }
@@ -78,7 +79,7 @@ int main (int args, char* argv[]) {
     time_t start = time(NULL);
     cerr << argv[0] << " is used to create the lattices" << endl;
 
-    if (args != 6) {
+    if (args != 7) {
         cerr << "usage: <RuleFile> <SourceText> <SourceTag> <SourceTrees> <TargetDir> <NumberOfLayers>" << endl;
         exit(1);
     }
