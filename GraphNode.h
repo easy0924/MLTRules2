@@ -15,7 +15,7 @@ using namespace std;
 
 #define MAX_LEN 100000000
 #define FULL_PROB 1.000000
-#define MINIMUM_PROB 0.500000
+#define MINIMUM_PROB 0.0500000
 
 typedef map<string, map<vector<int>, double> > RULES;
 typedef pair<string, pair<vector<int>, double> > RULE;

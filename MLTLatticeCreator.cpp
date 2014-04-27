@@ -23,6 +23,8 @@ MLTLatticeCreator::MLTLatticeCreator(char* ruleFile, int layers0) {
         double y;
         prob >> y;
 
+        if (y <= RULE_APPLICATION_THRESHOLD - EPS)
+            continue;
         cerr << "adding rule to lattice creator: " << endl;
         if (rules.find(lh) == rules.end())
             rules[lh] = RIGHT_RULES();
@@ -70,7 +72,6 @@ void MLTLatticeCreator::createLatticeForSentence(string txt, string tags, string
     TreeNode* tre = TreeNode::parseSentence(tree, dummy, dummy);
     vector<GraphNode*> mpath = GraphNode::parseSentence(txt);
     tre -> applyRules(rules, mpath, layers);
-    cerr << "test3" << endl;
     GraphNode::outputLattice(latFile, mpath[0]);
     latFile.close();
 }

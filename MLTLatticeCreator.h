@@ -16,6 +16,7 @@
 #include <utility>
 
 #define RULE_APPLICATION_THRESHOLD 0.1000000
+#define EPS 1e-8
 
 class MLTLatticeCreator {
 private:

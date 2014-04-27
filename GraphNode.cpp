@@ -48,40 +48,38 @@ void GraphNode::outputLattice(ostream &out, GraphNode* start) {
     queue<GraphNode*> q;
     vector<GraphNode*> lst;
     lst.clear();
+    start->id = cnt++;
     q.push(start);
     lst.push_back(start);
     while (!q.empty()) {
-        GraphNode *h = q.back();
+        GraphNode *h = q.front();
         q.pop();
-        if (h -> id == -1) {
-            h -> id = cnt ++;
-        }
         for (vector<Edge>::iterator i = h -> next.begin(); i != h -> next.end(); ++i) {
-            if ((*i).target -> id == -1)
+            if ((*i).target -> id == -1) {
+                (*i).target->id = cnt ++;
                 q.push((*i).target);
                 lst.push_back((*i).target);
+            }
         }
     }
     for (vector<GraphNode*>::iterator i = lst.begin(); i != lst.end(); ++i) {
         for (vector<Edge>::iterator j = (*i) -> next.begin(); j!= (*i) -> next.end(); ++j) {
-            out << ((*i) -> id) << " " << (((*j).target) -> id) << " " << (*j).word << " " << (*j).pos << " " << (*j).prob << " # " << (*j).comment << endl;
+            out << ((*i) -> id) << " " << (((*j).target) -> id) << " " << (*j).word << " " << (*j).pos + 1 << " " << (*j).prob << (((*j).comment == "")?"": " # " + (*j).comment) << endl;
         }
     }
 }
 
 void GraphNode::addBranch(vector<GraphNode*> &mpath, int startp, int endp, const vector<int> &branch, double prob,const RULE &rule) {
-    for (int i = 0; i + 1< mpath.size(); ++i)
-        cerr << mpath[i]->next[0].word << " ";
-    cerr << endl;
-    cerr << branch.size() << endl;
-    for (int i = 0; i < branch.size(); ++i)
-        cerr << branch[i] << " " << endl;
-    cerr << endl;
-
+//    for (int i = 0; i + 1< mpath.size(); ++i)
+//        cerr << mpath[i]->next[0].word << " ";
+//    cerr << endl;
+//    cerr << branch.size();
+//    for (int i = 0; i < branch.size(); ++i)
+//        cerr << branch[i] << " " << endl;
+//    cerr << endl;
     GraphNode* prev = mpath[endp + 1];
     for (vector<int>::const_reverse_iterator i = branch.rbegin(); i + 1 != branch.rend(); ++i) {
-        cerr << "test00" << endl;
-        GraphNode* x = new GraphNode(Edge(mpath[(*i)]->next[0].word, (*i), FULL_PROB, getComment(rule), prev));
+        GraphNode* x = new GraphNode(Edge(mpath[(*i)]->next[0].word, (*i), FULL_PROB, "", prev));
         prev = x;
     }
     mpath[startp]->next.push_back(Edge(mpath[branch[0]]->next[0].word, branch[0], prob, getComment(rule), prev));
@@ -93,8 +91,8 @@ string GraphNode::getComment(const RULE &rule) {
     res << "{'MLTRule': '" + rule.first + "#";
     res << rule.second.first[0];
     for (vector<int>::const_iterator i = rule.second.first.begin() + 1; i != rule.second.first.end(); ++i)
-        res << "_" + (*i);
-    res << "', 'WEIGHT': " << rule.second.second;
+        res << "_" << (*i);
+    res << "', 'WEIGHT': " << rule.second.second << "}";
     return res.str();
 }
 
